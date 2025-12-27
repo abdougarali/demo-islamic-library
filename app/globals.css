@@ -8,19 +8,118 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-reem-kufi: var(--font-reem-kufi);
+  --font-amiri: var(--font-amiri);
+  --font-cairo: var(--font-cairo);
+  
+  /* ألوان مخصصة للمكتبة الإسلامية */
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-beige-50: #fefaf9;
+  --color-beige-100: #fef3f2;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Utility class for line clamping */
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .font-reem-kufi {
+    font-family: var(--font-reem-kufi), sans-serif;
+  }
+  
+  .font-amiri {
+    font-family: var(--font-amiri), serif;
+  }
+  
+  .font-cairo {
+    font-family: var(--font-cairo), sans-serif;
+  }
+}
+
+/* Swiper Navigation Buttons - RTL Support - Professional Design */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #16a34a !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: 32px !important;
+  height: 32px !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease !important;
+  top: 50% !important;
+  margin-top: -16px !important;
+  opacity: 0.8 !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background: transparent !important;
+  transform: scale(1.05) !important;
+  color: #15803d !important;
+  opacity: 1 !important;
+}
+
+.swiper-button-next:active,
+.swiper-button-prev:active {
+  transform: scale(0.98) !important;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.swiper-button-next.swiper-button-disabled,
+.swiper-button-prev.swiper-button-disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+}
+
+/* In RTL, swap next/prev buttons */
+[dir="rtl"] .swiper-button-next {
+  left: 10px !important;
+  right: auto !important;
+}
+
+[dir="rtl"] .swiper-button-prev {
+  right: 10px !important;
+  left: auto !important;
+}
+
+/* Swiper Pagination - Professional Design */
+.swiper-pagination {
+  position: relative !important;
+  margin-top: 24px !important;
+}
+
+.swiper-pagination-bullet {
+  background-color: #cbd5e1 !important;
+  opacity: 1 !important;
+  width: 10px !important;
+  height: 10px !important;
+  transition: all 0.3s ease !important;
+  margin: 0 6px !important;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #16a34a !important;
+  width: 32px !important;
+  border-radius: 5px !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4) !important;
 }

@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# مكتبة إسلامية – نسخة تجريبية
 
-## Getting Started
+صفحة Demo / MVP بسيطة لمكتبة إسلامية أونلاين.
 
-First, run the development server:
+## الهدف
+
+تمكين صاحب مكتبة من تجربة البيع أونلاين بدون نظام معقّد، فقط عرض الكتب وطلبها عبر واتساب.
+
+## المميزات
+
+- ✅ صفحة واحدة بسيطة
+- ✅ عرض 8 كتب
+- ✅ طلب مباشر عبر واتساب
+- ✅ تصميم Responsive
+- ✅ بدون Backend
+- ✅ بدون تسجيل دخول
+
+## التقنيات المستخدمة
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+
+## التشغيل
 
 ```bash
+# تثبيت الحزم
+npm install
+
+# تشغيل المشروع في وضع التطوير (على المنفذ 3003)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# سيعمل على: http://localhost:3003
+
+# بناء المشروع للإنتاج
+npm run build
+
+# تشغيل النسخة المبنية (على المنفذ 3003)
+npm start
+# سيعمل على: http://localhost:3003
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## التخصيص
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### تغيير بيانات الكتب
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+عدّل ملف `data/books.ts` لتغيير الكتب المعروضة.
 
-## Learn More
+### تغيير رقم واتساب
 
-To learn more about Next.js, take a look at the following resources:
+في ملف `app/page.tsx`، غيّر الرقم `1234567890` في دالة `handleWhatsAppOrder` برقم الواتساب الخاص بك.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### التصميم
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+التصميم يستخدم Tailwind CSS. يمكنك تعديل الألوان والتصميم من خلال تعديل className في الملفات.
 
-## Deploy on Vercel
+## ملاحظات
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- هذه نسخة Demo فقط
+- لا يوجد تتبع طلبات
+- لا يوجد لوحة تحكم
+- الهدف منها تجربة البيع وليس إدارة المكتبة

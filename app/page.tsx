@@ -96,14 +96,14 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
             {/* Logo - Right side (start in RTL) - in the middle of first book */}
             <div className="flex justify-center lg:justify-center">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm">
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm" style={{ aspectRatio: '1/1' }}>
                 <Image
                   src="/brand-img.jpg"
                   alt="شعار مكتبة بشر"
                   fill
                   className="object-cover"
                   priority
-                  quality={85}
+                  quality={75}
                   sizes="56px"
                 />
               </div>
@@ -178,22 +178,22 @@ export default function Home() {
               <SwiperSlide key={book.id}>
                 <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
                   {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
+                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '1/1' }}>
                     <Image
                       src={book.image}
                       alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      loading={index < 4 ? "eager" : "lazy"}
-                      priority={index < 4}
-                      quality={85}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      priority={index < 2}
+                      quality={80}
                     />
                   </div>
 
                   {/* معلومات الكتاب */}
                   <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
                       {formatBookTitle(book.title)}
                     </h3>
                     <p className="text-sm text-gray-600 mb-3">{book.author}</p>
@@ -253,7 +253,7 @@ export default function Home() {
               <SwiperSlide key={book.id}>
                 <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
                   {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
+                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '1/1' }}>
                     <Image
                       src={book.image}
                       alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
@@ -261,13 +261,13 @@ export default function Home() {
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       loading="lazy"
-                      quality={85}
+                      quality={80}
                     />
                   </div>
 
                   {/* معلومات الكتاب */}
                   <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
                       {formatBookTitle(book.title)}
                     </h3>
                     <p className="text-sm text-gray-600 mb-3">{book.author}</p>

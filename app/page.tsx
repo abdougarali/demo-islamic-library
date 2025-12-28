@@ -92,11 +92,11 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-stone-50">
       {/* Header */}
       <header className="bg-gradient-to-b from-green-50 to-white/60 backdrop-blur-md sticky top-0 z-50 border-b border-green-100 shadow-sm">
-        <div className="container mx-auto px-4 py-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
+        <div className="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 lg:py-3">
+          <div className="flex items-center justify-between gap-2 sm:gap-3 lg:grid lg:grid-cols-4 lg:gap-6 lg:justify-items-center">
             {/* Logo - Right side (start in RTL) - in the middle of first book */}
             <div className="flex justify-center lg:justify-center">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm">
+              <div className="relative w-9 h-9 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full overflow-hidden ring-1 lg:ring-2 ring-gray-100 shadow-sm">
                 <Image
                   src="/brand-img.jpg"
                   alt="شعار مكتبة بشر"
@@ -104,29 +104,29 @@ export default function Home() {
                   className="object-cover"
                   priority
                   quality={75}
-                  sizes="56px"
+                  sizes="(max-width: 640px) 36px, (max-width: 768px) 40px, 56px"
                 />
               </div>
             </div>
 
             {/* Title - Center - spans 2 columns on lg (same width as 2 middle books) */}
-            <div className="col-span-1 sm:col-span-2 lg:col-span-2 flex justify-center items-center w-full">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl  text-gray-900 leading-tight font-reem-kufi whitespace-nowrap text-center transform scale-x-125 sm:scale-x-[1.5] md:scale-x-[1.8] origin-center">
+            <div className="flex-1 lg:col-span-2 flex justify-center items-center min-w-0">
+              <h2 className="text-lg sm:text-xl md:text-4xl text-gray-900 leading-tight font-reem-kufi text-center whitespace-nowrap overflow-hidden text-ellipsis transform scale-x-[1.15] sm:scale-x-[1.3] md:scale-x-[1.8] origin-center">
                 مكتبة بشر
               </h2>
             </div>
 
-            {/* WhatsApp Icon - Left side (end in RTL) - in the middle of last book */}
-            <div className="flex justify-center lg:justify-center">
+            {/* WhatsApp Icon - Left side (end in RTL) - in the middle of last book - Hidden on mobile & tablet, visible on large screens */}
+            <div className="hidden lg:flex lg:justify-center">
               <a
                 href={`https://wa.me/+905011375220?text=${encodeURIComponent("سلام عليكم")}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
+                className="flex items-center justify-center w-12 h-12 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
                 aria-label="اتصل بنا عبر واتساب"
               >
                 <svg
-                  className="w-5 h-5 sm:w-6 sm:h-6 text-white"
+                  className="w-6 h-6 text-white"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
@@ -328,7 +328,7 @@ export default function Home() {
                 </svg>
               </div>
               <div className="md:hidden flex justify-center my-2">
-                <svg className="w-8 h-8 text-green-600 rotate-[-90deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-green-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -352,7 +352,7 @@ export default function Home() {
                 </svg>
               </div>
               <div className="md:hidden flex justify-center my-2">
-                <svg className="w-8 h-8 text-green-600 rotate-[-90deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-green-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -376,7 +376,7 @@ export default function Home() {
                 </svg>
               </div>
               <div className="md:hidden flex justify-center my-2">
-                <svg className="w-8 h-8 text-green-600 rotate-[-90deg]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-green-600 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>
               </div>

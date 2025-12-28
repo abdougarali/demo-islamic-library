@@ -96,7 +96,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-center">
             {/* Logo - Right side (start in RTL) - in the middle of first book */}
             <div className="flex justify-center lg:justify-center">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm" style={{ aspectRatio: '1/1' }}>
+              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm">
                 <Image
                   src="/brand-img.jpg"
                   alt="شعار مكتبة بشر"
@@ -178,7 +178,7 @@ export default function Home() {
               <SwiperSlide key={book.id}>
                 <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
                   {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '1/1' }}>
+                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
                       src={book.image}
                       alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
@@ -253,7 +253,7 @@ export default function Home() {
               <SwiperSlide key={book.id}>
                 <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
                   {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden" style={{ aspectRatio: '1/1' }}>
+                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
                       src={book.image}
                       alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}

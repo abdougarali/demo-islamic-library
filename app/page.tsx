@@ -28,7 +28,7 @@ export default function Home() {
       message += `💰 ${formattedPrice}\n`;
     }
     message += `\nشكراً لكم`;
-    const whatsappUrl = `https://wa.me/+21626010403?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/+905011375220?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
 
@@ -119,7 +119,7 @@ export default function Home() {
             {/* WhatsApp Icon - Left side (end in RTL) - in the middle of last book */}
             <div className="flex justify-center lg:justify-center">
               <a
-                href={`https://wa.me/+21626010403?text=${encodeURIComponent("سلام عليكم")}`}
+                href={`https://wa.me/+905011375220?text=${encodeURIComponent("سلام عليكم")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
@@ -402,7 +402,7 @@ export default function Home() {
       <button
         onClick={() => {
           const message = "سلام عليكم";
-          const whatsappUrl = `https://wa.me/+21626010403?text=${encodeURIComponent(message)}`;
+          const whatsappUrl = `https://wa.me/+905011375220?text=${encodeURIComponent(message)}`;
           window.open(whatsappUrl, "_blank");
         }}
         className="fixed bottom-6 right-6 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl hover:shadow-green-500/50 transition-all duration-300 flex items-center justify-center group hover:scale-110"

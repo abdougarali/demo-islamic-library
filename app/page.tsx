@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, type ReactElement } from "react";
 import Image from "next/image";
 import { books } from "@/data/books";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -15,13 +16,34 @@ import "swiper/css/pagination";
 export default function Home() {
   /**
    * دالة لفتح واتساب مع رسالة جاهزة
-   * ملاحظة: يجب تغيير رقم 1234567890 برقم الواتساب الخاص بك
+   * ملاحظة: يجب تغيير رقم الواتساب برقم الواتساب الخاص بك
    */
-  const handleWhatsAppOrder = (bookTitle: string) => {
-    const message = `السلام عليكم: ${bookTitle}`;
+  const handleWhatsAppOrder = (bookTitle: string, author: string, price?: number) => {
+    let message = `السلام عليكم ورحمة الله وبركاته\n\n`;
+    message += `أريد طلب الكتاب التالي:\n`;
+    message += `📖 ${bookTitle}\n`;
+    message += `✍️ ${author}\n`;
+    if (price) {
+      const formattedPrice = formatPrice(price);
+      message += `💰 ${formattedPrice}\n`;
+    }
+    message += `\nشكراً لكم`;
     const whatsappUrl = `https://wa.me/+21626010403?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
   };
+
+  /**
+   * NumberFormatter محفوظ في الذاكرة لتحسين الأداء
+   */
+  const priceFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat("ar-TN", {
+        style: "currency",
+        currency: "TND",
+        minimumFractionDigits: 0,
+      }),
+    []
+  );
 
   /**
    * دالة لتنسيق السعر
@@ -29,11 +51,41 @@ export default function Home() {
    */
   const formatPrice = (price?: number) => {
     if (!price) return null;
-    return new Intl.NumberFormat("ar-TN", {
-      style: "currency",
-      currency: "TND",
-      minimumFractionDigits: 0,
-    }).format(price / 1000);
+    return priceFormatter.format(price / 1000);
+  };
+
+  /**
+   * دالة لتنسيق عنوان الكتاب - جعل الرمز ﷺ أكبر
+   */
+  const formatBookTitle = (title: string) => {
+    // استبدال الرمز ﷺ (U+FDFA) بـ span مع class لجعله أكبر
+    const salawat = '\uFDFA'; // الرمز ﷺ
+    
+    // إذا لم يوجد الرمز، أرجع العنوان كـ JSX
+    if (!title.includes(salawat)) {
+      return <>{title}</>;
+    }
+    
+    // تقسيم العنوان حسب الرمز
+    const parts: (string | ReactElement)[] = [];
+    const segments = title.split(salawat);
+    
+    segments.forEach((segment, index) => {
+      // إضافة النص
+      if (segment) {
+        parts.push(segment);
+      }
+      // إضافة الرمز مع span (إلا إذا كان آخر segment)
+      if (index < segments.length - 1) {
+        parts.push(
+          <span key={`salawat-${index}`} className="book-title-salawat">
+            {salawat}
+          </span>
+        );
+      }
+    });
+    
+    return <>{parts}</>;
   };
 
   return (
@@ -47,11 +99,12 @@ export default function Home() {
               <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden ring-2 ring-gray-100 shadow-sm">
                 <Image
                   src="/brand-img.jpg"
-                  alt="مكتبة بشر"
+                  alt="شعار مكتبة بشر"
                   fill
                   className="object-cover"
                   priority
-                  quality={75}
+                  quality={85}
+                  sizes="56px"
                 />
               </div>
             </div>
@@ -95,9 +148,6 @@ export default function Home() {
           <p className="text-2xl sm:text-3xl md:text-4xl text-gray-700 font-amiri">
             اطلب كتابك المفضل عبر واتساب بسهولة
           </p>
-          <p className="text-lg text-gray-600 font-cairo mt-2">
-            ({books.length} كتاب متاح)
-          </p>
         </div>
       </section>
 
@@ -112,6 +162,7 @@ export default function Home() {
             slidesPerGroup={1}
             navigation
             pagination={{ clickable: true }}
+            initialSlide={3}
             breakpoints={{
               640: {
                 slidesPerView: 2,
@@ -130,19 +181,20 @@ export default function Home() {
                   <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
                       src={book.image}
-                      alt={book.title}
+                      alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       loading={index < 4 ? "eager" : "lazy"}
                       priority={index < 4}
+                      quality={85}
                     />
                   </div>
 
                   {/* معلومات الكتاب */}
                   <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2">
-                      {book.title}
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
+                      {formatBookTitle(book.title)}
                     </h3>
                     <p className="text-sm text-gray-600 mb-3">{book.author}</p>
 
@@ -155,8 +207,9 @@ export default function Home() {
 
                     {/* زر الطلب عبر واتساب */}
                     <button
-                      onClick={() => handleWhatsAppOrder(book.title)}
+                      onClick={() => handleWhatsAppOrder(book.title, book.author, book.price)}
                       className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      aria-label={`طلب ${book.title} عبر واتساب`}
                     >
                       <svg
                         className="w-5 h-5"
@@ -184,6 +237,7 @@ export default function Home() {
             slidesPerGroup={1}
             navigation
             pagination={{ clickable: true }}
+            initialSlide={3}
             breakpoints={{
               640: {
                 slidesPerView: 2,
@@ -202,18 +256,19 @@ export default function Home() {
                   <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
                       src={book.image}
-                      alt={book.title}
+                      alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       loading="lazy"
+                      quality={85}
                     />
                   </div>
 
                   {/* معلومات الكتاب */}
                   <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2">
-                      {book.title}
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2 min-h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
+                      {formatBookTitle(book.title)}
                     </h3>
                     <p className="text-sm text-gray-600 mb-3">{book.author}</p>
 
@@ -226,8 +281,9 @@ export default function Home() {
 
                     {/* زر الطلب عبر واتساب */}
                     <button
-                      onClick={() => handleWhatsAppOrder(book.title)}
+                      onClick={() => handleWhatsAppOrder(book.title, book.author, book.price)}
                       className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      aria-label={`طلب ${book.title} عبر واتساب`}
                     >
                       <svg
                         className="w-5 h-5"
@@ -349,7 +405,7 @@ export default function Home() {
           const whatsappUrl = `https://wa.me/+21626010403?text=${encodeURIComponent(message)}`;
           window.open(whatsappUrl, "_blank");
         }}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl hover:shadow-green-500/50 transition-all duration-300 flex items-center justify-center group animate-bounce hover:animate-none"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl hover:shadow-green-500/50 transition-all duration-300 flex items-center justify-center group hover:scale-110"
         aria-label="اطلب الآن عبر واتساب"
       >
         <svg
@@ -372,7 +428,7 @@ export default function Home() {
             <div className="flex justify-center items-center gap-6">
               {/* Facebook Icon */}
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/profile.php?id=100092725701351"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-700 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors"
@@ -390,7 +446,7 @@ export default function Home() {
 
               {/* Instagram Icon */}
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/Books.besher"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-10 h-10 bg-gray-700 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-orange-500 rounded-full flex items-center justify-center transition-all"

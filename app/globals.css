@@ -48,6 +48,16 @@ body {
   .font-cairo {
     font-family: var(--font-cairo), sans-serif;
   }
+  
+  /* جعل الرمز ﷺ (صلى الله عليه وسلم) أكبر في أسماء الكتب */
+  .book-title-salawat {
+    font-size: 2.5em !important;
+    line-height: 1 !important;
+    vertical-align: baseline !important;
+    display: inline-block !important;
+    font-weight: normal !important;
+    margin: 0 2px !important;
+  }
 }
 
 /* Swiper Navigation Buttons - RTL Support - Professional Design */

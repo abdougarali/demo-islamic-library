@@ -8,6 +8,7 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { trackFacebookEvent } from "@/components/FacebookPixel";
 
 /**
  * صفحة Demo / MVP لمكتبة إسلامية
@@ -19,6 +20,20 @@ export default function Home() {
    * ملاحظة: يجب تغيير رقم الواتساب برقم الواتساب الخاص بك
    */
   const handleWhatsAppOrder = (bookTitle: string, author: string, price?: number) => {
+    // تتبع حدث Facebook Pixel: InitiateCheckout (بدء عملية الشراء)
+    trackFacebookEvent("InitiateCheckout", {
+      content_name: bookTitle,
+      content_category: "Book",
+      content_ids: [bookTitle],
+      value: price ? price / 1000 : undefined, // تحويل من مليم إلى دينار
+      currency: "TND",
+    });
+
+    // تتبع حدث Contact (اتصال)
+    trackFacebookEvent("Contact", {
+      content_name: bookTitle,
+    });
+
     let message = `السلام عليكم ورحمة الله وبركاته\n\n`;
     message += `أريد طلب الكتاب التالي:\n`;
     message += `📖 ${bookTitle}\n`;
@@ -93,63 +108,15 @@ export default function Home() {
       {/* Header */}
       <header className="bg-gradient-to-b from-green-50 to-white/60 backdrop-blur-md sticky top-0 z-50 border-b border-green-100 shadow-sm">
         <div className="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 lg:py-3">
-          <div className="flex items-center justify-between gap-2 sm:gap-3 lg:grid lg:grid-cols-4 lg:gap-6 lg:justify-items-center">
-            {/* Logo - Right side (start in RTL) - in the middle of first book */}
-            <div className="flex justify-center lg:justify-center">
-              <div className="relative w-9 h-9 sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full overflow-hidden ring-1 lg:ring-2 ring-gray-100 shadow-sm">
-                <Image
-                  src="/brand-img.jpg"
-                  alt="شعار مكتبة بشر"
-                  fill
-                  className="object-cover"
-                  priority
-                  quality={75}
-                  sizes="(max-width: 640px) 36px, (max-width: 768px) 40px, 56px"
-                />
-              </div>
-            </div>
-
-            {/* Title - Center - spans 2 columns on lg (same width as 2 middle books) */}
-            <div className="flex-1 lg:col-span-2 flex justify-center items-center min-w-0">
-              <h2 className="text-lg sm:text-xl md:text-4xl text-gray-900 leading-tight font-reem-kufi text-center whitespace-nowrap overflow-hidden text-ellipsis transform scale-x-[1.15] sm:scale-x-[1.3] md:scale-x-[1.8] origin-center">
-                مكتبة بشر
-              </h2>
-            </div>
-
-            {/* WhatsApp Icon - Left side (end in RTL) - in the middle of last book - Hidden on mobile & tablet, visible on large screens */}
-            <div className="hidden lg:flex lg:justify-center">
-              <a
-                href={`https://wa.me/+905011375220?text=${encodeURIComponent("سلام عليكم")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-12 h-12 bg-green-500 hover:bg-green-600 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 group"
-                aria-label="اتصل بنا عبر واتساب"
-              >
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-                </svg>
-              </a>
-            </div>
+          <div className="flex items-center justify-center">
+            {/* Title - Center */}
+            <h2 className="text-lg sm:text-xl md:text-4xl text-gray-900 leading-tight font-reem-kufi text-center whitespace-nowrap overflow-hidden text-ellipsis transform scale-x-[1.15] sm:scale-x-[1.3] md:scale-x-[1.8] origin-center">
+              مكتبة النور
+            </h2>
           </div>
         </div>
       </header>
 
-      {/* نص ترحيبي */}
-      <section className="container mx-auto px-4 pt-8 pb-2">
-        <div className="text-center space-y-2">
-          <p className="text-2xl sm:text-3xl md:text-4xl text-gray-700 font-amiri">
-            مرحباً بكم في مكتبة بشر
-          </p>
-          <p className="text-2xl sm:text-3xl md:text-4xl text-gray-700 font-amiri">
-            اطلب كتابك المفضل عبر واتساب بسهولة
-          </p>
-        </div>
-      </section>
 
       {/* قسم عرض الكتب */}
       <main className="container mx-auto px-4 pt-6 pb-12">
@@ -176,7 +143,7 @@ export default function Home() {
           >
             {books.slice(0, 11).map((book, index) => (
               <SwiperSlide key={book.id}>
-                <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
+                  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 h-full">
                   {/* صورة الغلاف */}
                   <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
@@ -251,7 +218,7 @@ export default function Home() {
           >
             {books.slice(11, 21).map((book) => (
               <SwiperSlide key={book.id}>
-                <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full">
+                  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 h-full">
                   {/* صورة الغلاف */}
                   <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
                     <Image
@@ -303,7 +270,7 @@ export default function Home() {
         </div>
 
         {/* قسم توضيحي - كيف تطلب كتابك */}
-        <section className="bg-white rounded-lg shadow-md p-8 mb-6 font-cairo">
+        <section className="bg-white rounded-lg shadow-md p-8 mb-8 font-cairo">
           <h2 className="text-2xl font-bold text-gray-800 mb-12 text-center">
             كيف تطلب كتابك؟
           </h2>
@@ -396,11 +363,124 @@ export default function Home() {
           </div>
         </section>
 
+        {/* قسم مميزاتنا */}
+        <section className="bg-gradient-to-br from-green-50 to-stone-50 rounded-lg shadow-md p-8 mb-8 font-cairo">
+          <h2 className="text-2xl font-bold text-gray-800 mb-10 text-center">
+            لماذا تختار مكتبة النور؟
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* ميزة 1 */}
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">توصيل سريع</h3>
+              <p className="text-sm text-gray-600">نوصل طلبك بأسرع وقت ممكن</p>
+            </div>
+
+            {/* ميزة 2 */}
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">كتب أصلية</h3>
+              <p className="text-sm text-gray-600">جميع الكتب أصلية ومضمونة الجودة</p>
+            </div>
+
+            {/* ميزة 3 */}
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">أسعار مناسبة</h3>
+              <p className="text-sm text-gray-600">أسعار تنافسية ومناسبة للجميع</p>
+            </div>
+
+            {/* ميزة 4 */}
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
+              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-2">خدمة عملاء متميزة</h3>
+              <p className="text-sm text-gray-600">نحن دائماً هنا لمساعدتك</p>
+            </div>
+          </div>
+        </section>
+
+        {/* قسم الأسئلة الشائعة */}
+        <section className="bg-white rounded-lg shadow-md p-8 mb-8 font-cairo">
+          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
+            أسئلة شائعة
+          </h2>
+          <div className="max-w-3xl mx-auto space-y-4">
+            {/* سؤال 1 */}
+            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                💳 كيف يمكنني الدفع؟
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                الدفع يتم نقداً عند الاستلام. لا حاجة للدفع مسبقاً.
+              </p>
+            </div>
+
+            {/* سؤال 2 */}
+            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                📦 كم تستغرق مدة التوصيل؟
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                نوصل الطلبات خلال 3-7 أيام عمل حسب موقعك. سيتم التواصل معك عبر واتساب لتأكيد العنوان.
+              </p>
+            </div>
+
+            {/* سؤال 3 */}
+            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                🗺️ هل تصلون لجميع المناطق؟
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                نعم، نقدم خدمة التوصيل لجميع أنحاء تونس. يمكنك التواصل معنا عبر واتساب للاستفسار عن منطقتك.
+              </p>
+            </div>
+
+            {/* سؤال 4 */}
+            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                📚 هل جميع الكتب متوفرة؟
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                نعم، جميع الكتب المعروضة متوفرة. في حالة عدم التوفر، سنتواصل معك فوراً عبر واتساب.
+              </p>
+            </div>
+
+            {/* سؤال 5 */}
+            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">
+                ❓ هل يمكنني طلب أكثر من كتاب؟
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                نعم بالطبع! يمكنك طلب أي عدد من الكتب. فقط اختر الكتب التي تريدها واضغط على زر "اطلب عبر واتساب" لكل كتاب.
+              </p>
+            </div>
+          </div>
+        </section>
+
       </main>
 
       {/* Floating WhatsApp Button - Big Icon in Right Corner */}
       <button
         onClick={() => {
+          // تتبع حدث Facebook Pixel: Contact (اتصال عام)
+          trackFacebookEvent("Contact");
+          
           const message = "سلام عليكم";
           const whatsappUrl = `https://wa.me/+905011375220?text=${encodeURIComponent(message)}`;
           window.open(whatsappUrl, "_blank");
@@ -419,23 +499,20 @@ export default function Home() {
       </button>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8 font-cairo">
+      <footer className="bg-[#e5f5e0] text-gray-800 py-8 font-cairo">
         <div className="container mx-auto px-4">
           <div className="text-center mb-6">
-            <p className="text-sm mb-4">
-              للاستفسار: اتصل بنا عبر واتساب
-            </p>
             <div className="flex justify-center items-center gap-6">
               {/* Facebook Icon */}
               <a
                 href="https://www.facebook.com/profile.php?id=100092725701351"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-700 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors"
+                className="w-10 h-10 bg-gray-600 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors"
                 aria-label="صفحتنا على فيسبوك"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-5 h-5 text-white"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
@@ -449,11 +526,11 @@ export default function Home() {
                 href="https://www.instagram.com/Books.besher"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-700 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-orange-500 rounded-full flex items-center justify-center transition-all"
+                className="w-10 h-10 bg-gray-600 hover:bg-gradient-to-r hover:from-purple-500 hover:via-pink-500 hover:to-orange-500 rounded-full flex items-center justify-center transition-all"
                 aria-label="صفحتنا على إنستغرام"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-5 h-5 text-white"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
@@ -463,9 +540,9 @@ export default function Home() {
               </a>
             </div>
           </div>
-          <div className="text-center border-t border-gray-700 pt-6 mt-6">
+          <div className="text-center border-t border-gray-600 pt-6 mt-6">
             <p className="text-sm">
-              © 2025 مكتبة بشر. جميع الحقوق محفوظة.
+              © 2025 مكتبة النور. جميع الحقوق محفوظة.
             </p>
           </div>
         </div>

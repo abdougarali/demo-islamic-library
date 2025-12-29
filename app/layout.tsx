@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Reem_Kufi, Amiri, Cairo } from "next/font/google";
 import "./globals.css";
+import FacebookPixel from "@/components/FacebookPixel";
 
 const reemKufi = Reem_Kufi({
   weight: ["400", "700"],
@@ -24,21 +25,45 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "مكتبة بشر - شراء الكتب الإسلامية أونلاين",
+  title: "مكتبة النور - شراء الكتب الإسلامية أونلاين",
   description: "مكتبة إسلامية أونلاين - اطلب كتابك المفضل عبر واتساب بسهولة. مجموعة متنوعة من الكتب الإسلامية والفقهية والتفسير",
   keywords: ["مكتبة إسلامية", "كتب إسلامية", "كتب دينية", "كتب فقهية", "تفسير القرآن", "السيرة النبوية", "شراء كتب أونلاين", "تونس"],
-  authors: [{ name: "مكتبة بشر" }],
+  authors: [{ name: "مكتبة النور" }],
   openGraph: {
-    title: "مكتبة بشر - شراء الكتب الإسلامية أونلاين",
+    title: "مكتبة النور - شراء الكتب الإسلامية أونلاين",
     description: "مكتبة إسلامية أونلاين - اطلب كتابك المفضل عبر واتساب بسهولة",
     type: "website",
     locale: "ar_TN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "مكتبة بشر - شراء الكتب الإسلامية أونلاين",
+    title: "مكتبة النور - شراء الكتب الإسلامية أونلاين",
     description: "مكتبة إسلامية أونلاين - اطلب كتابك المفضل عبر واتساب بسهولة",
   },
+};
+
+// Structured Data for SEO - يتم إضافتها في layout لتجنب hydration mismatch
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "BookStore",
+  name: "مكتبة النور",
+  description: "مكتبة إسلامية أونلاين - اطلب كتابك المفضل عبر واتساب بسهولة",
+  telephone: "+905011375220",
+  priceRange: "$$",
+  address: {
+    "@type": "PostalAddress",
+    addressCountry: "TN",
+    addressLocality: "تونس"
+  },
+  sameAs: [
+    "https://www.facebook.com/profile.php?id=100092725701351",
+    "https://www.instagram.com/Books.besher"
+  ],
+  potentialAction: {
+    "@type": "CommunicateAction",
+    target: "https://wa.me/+905011375220",
+    "http://schema.org/instrument": "WhatsApp"
+  }
 };
 
 export default function RootLayout({
@@ -51,6 +76,12 @@ export default function RootLayout({
       <body
         className={`${reemKufi.variable} ${amiri.variable} ${cairo.variable} antialiased`}
       >
+        {/* Structured Data for SEO - في layout (Server Component) لتجنب hydration mismatch */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <FacebookPixel />
         {children}
       </body>
     </html>

@@ -215,3 +215,5 @@ export const metadata: Metadata = {
 - **لكن Metadata مهم جداً**: بدونها، لن تظهر الصفحة بشكل جيد في محركات البحث
 
 
+
+

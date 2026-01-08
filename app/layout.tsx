@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Reem_Kufi, Amiri, Cairo } from "next/font/google";
 import "./globals.css";
 import FacebookPixel from "@/components/FacebookPixel";
+import { ToastProvider } from "@/components/ToastContainer";
 
 const reemKufi = Reem_Kufi({
   weight: ["400", "700"],
@@ -81,8 +82,10 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
-        <FacebookPixel />
-        {children}
+        <ToastProvider>
+          <FacebookPixel />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

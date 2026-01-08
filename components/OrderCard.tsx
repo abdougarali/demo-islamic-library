@@ -73,7 +73,7 @@ export default function OrderCard({ order, onStatusChange }: OrderCardProps) {
   };
 
   const getStatusButtons = () => {
-    const buttons = [];
+    const buttons: React.ReactElement[] = [];
     
     // إذا كان الطلب ملغى، لا تظهر أي أزرار
     if (currentStatus === 'canceled') {

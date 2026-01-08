@@ -46,9 +46,9 @@ export default function OrderModal({ isOpen, onClose, initialBookId }: OrderModa
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-4xl max-h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden animate-fade-in">
+      <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-white">
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-gray-200 bg-gradient-to-r from-green-50 to-white">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 font-reem-kufi">
             اطلب عبر الموقع
           </h2>
@@ -73,11 +73,9 @@ export default function OrderModal({ isOpen, onClose, initialBookId }: OrderModa
           </button>
         </div>
 
-        {/* Body - Scrollable */}
-        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
-          <div className="p-4 sm:p-6">
-            <OrderForm initialBookId={initialBookId} onSuccess={onClose} />
-          </div>
+        {/* Body - No Scroll */}
+        <div className="p-4 sm:p-5">
+          <OrderForm initialBookId={initialBookId} onSuccess={onClose} showTitle={false} />
         </div>
       </div>
 

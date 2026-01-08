@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import { useMemo, useState, type ReactElement } from "react";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import "swiper/css/pagination";
 import { trackFacebookEvent } from "@/components/FacebookPixel";
 import OrderForm from "@/components/OrderForm";
 import OrderModal from "@/components/OrderModal";
+import BookDetailsModal from "@/components/BookDetailsModal";
 import { useToast } from "@/components/ToastContainer";
 
 /**
@@ -19,17 +20,37 @@ import { useToast } from "@/components/ToastContainer";
  */
 export default function Home() {
   const toast = useToast();
-  // State لإدارة Modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // State لإدارة Order Modal
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState<string | undefined>(undefined);
+  
+  // State لإدارة Book Details Modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedDetailsBookId, setSelectedDetailsBookId] = useState<string | null>(null);
 
   /**
-   * فتح Modal مع كتاب محدد
+   * فتح Book Details Modal عند النقر على البطاقة
    */
-  const handleOpenModal = (bookId: string) => {
+  const handleOpenDetailsModal = (bookId: string) => {
+    setSelectedDetailsBookId(bookId);
+    setIsDetailsModalOpen(true);
+  };
+
+  /**
+   * إغلاق Book Details Modal
+   */
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedDetailsBookId(null);
+  };
+
+  /**
+   * فتح Order Modal من Book Details Modal
+   */
+  const handleOpenOrderModal = (bookId: string) => {
     const book = books.find(b => b.id === bookId);
     setSelectedBookId(bookId);
-    setIsModalOpen(true);
+    setIsOrderModalOpen(true);
     // Toast لإعلام المستخدم أن الكتاب تم إضافته
     if (book) {
       toast.showSuccess(`تم إضافة "${book.title}" إلى السلة`, 3000);
@@ -37,10 +58,23 @@ export default function Home() {
   };
 
   /**
-   * إغلاق Modal
+   * فتح Order Modal مباشرة (من الزر)
    */
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleOpenOrderModalDirect = (bookId: string) => {
+    const book = books.find(b => b.id === bookId);
+    setSelectedBookId(bookId);
+    setIsOrderModalOpen(true);
+    // Toast لإعلام المستخدم أن الكتاب تم إضافته
+    if (book) {
+      toast.showSuccess(`تم إضافة "${book.title}" إلى السلة`, 3000);
+    }
+  };
+
+  /**
+   * إغلاق Order Modal
+   */
+  const handleCloseOrderModal = () => {
+    setIsOrderModalOpen(false);
     setSelectedBookId(undefined);
   };
 
@@ -133,103 +167,115 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-stone-50">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 via-white to-stone-50">
       {/* Header */}
-      <header className="bg-gradient-to-b from-green-50 to-white/60 backdrop-blur-md sticky top-0 z-50 border-b border-green-100 shadow-sm">
-        <div className="container mx-auto px-3 sm:px-4 py-1.5 sm:py-2 lg:py-3">
+      <header className="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-green-100/50 shadow-md shadow-green-100/20">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center justify-center">
             {/* Title - Center */}
-              <h2 className="text-lg sm:text-xl md:text-4xl text-gray-900 leading-tight font-reem-kufi text-center whitespace-nowrap overflow-hidden text-ellipsis transform scale-x-[1.15] sm:scale-x-[1.3] md:scale-x-[1.8] origin-center">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl text-gray-900 leading-tight font-reem-kufi text-center font-bold tracking-tight transform scale-x-[1.1] sm:scale-x-[1.2] md:scale-x-[1.4] origin-center bg-gradient-to-r from-green-700 via-green-600 to-green-700 bg-clip-text text-transparent">
               مكتبة النور
-              </h2>
+            </h1>
           </div>
         </div>
       </header>
 
       {/* قسم عرض الكتب */}
-      <main className="container mx-auto px-4 pt-6 pb-12">
-        {/* المجموعة الأولى */}
-        <div className="mb-12">
-          <Swiper
-            modules={[Navigation, Pagination]}
-            spaceBetween={24}
-            slidesPerView={1}
-            slidesPerGroup={1}
-            navigation
-            pagination={{ clickable: true }}
-            initialSlide={3}
-            breakpoints={{
-              640: {
-                slidesPerView: 2,
-                slidesPerGroup: 1,
-              },
-              1024: {
-                slidesPerView: 4,
-                slidesPerGroup: 1,
-              },
-            }}
-          >
-            {books.slice(0, 11).map((book, index) => (
-              <SwiperSlide key={book.id}>
-                  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 h-full">
-                  {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
-                    <Image
-                      src={book.image}
-                      alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      loading={index < 2 ? "eager" : "lazy"}
-                      priority={index < 2}
-                      quality={80}
-                    />
-                  </div>
+      <main className="container mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20">
+        {/* قسم الأكثر مبيعاً */}
+        <section className="mb-20 sm:mb-24">
+          {/* Grid الأكثر مبيعاً - تصميم مميز بدون كاروسيل */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8 mb-16 sm:mb-20">
+            {books.slice(0, 8).map((book, index) => (
+              <div 
+                key={book.id} 
+                className="bg-white rounded-2xl shadow-xl border-2 border-green-100 overflow-hidden hover:shadow-2xl hover:shadow-green-200/50 hover:-translate-y-2 transition-all duration-300 h-full flex flex-col group relative cursor-pointer"
+                onClick={() => handleOpenDetailsModal(book.id)}
+              >
+                {/* Badge الأكثر مبيعاً */}
+                <div className="absolute top-3 right-3 z-10 bg-gradient-to-r from-green-600 to-green-700 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg shadow-green-500/30 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  <span>الأكثر مبيعاً</span>
+                </div>
+                
+                {/* صورة الغلاف */}
+                <div className="w-full h-80 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                  <Image
+                    src={book.image}
+                    alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    loading={index < 4 ? "eager" : "lazy"}
+                    priority={index < 4}
+                    quality={90}
+                  />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
 
-                  {/* معلومات الكتاب */}
-                  <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
-                      {formatBookTitle(book.title)}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3">{book.author}</p>
+                {/* معلومات الكتاب */}
+                <div className="p-5 sm:p-6 font-cairo flex-1 flex flex-col">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2 leading-snug group-hover:text-green-700 transition-colors" title={book.title}>
+                    {formatBookTitle(book.title)}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 font-medium">{book.author}</p>
 
-                    {/* السعر */}
-                    {book.price && (
-                      <p className="text-lg font-bold text-green-700 mb-4">
+                  {/* السعر */}
+                  {book.price && (
+                    <div className="mb-5">
+                      <p className="text-xl sm:text-2xl font-bold text-green-600">
                         {formatPrice(book.price)}
                       </p>
-                    )}
+                    </div>
+                  )}
 
-                    {/* زر الطلب */}
-                    <button
-                      onClick={() => handleOpenModal(book.id)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                      aria-label={`طلب ${book.title} عبر الموقع`}
+                  {/* زر الطلب */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // منع فتح Details Modal عند النقر على الزر
+                      handleOpenOrderModalDirect(book.id);
+                    }}
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-green-500/30 mt-auto"
+                    aria-label={`طلب ${book.title} عبر الموقع`}
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                        />
-                      </svg>
-                      <span>اطلب عبر الموقع</span>
-                    </button>
-                  </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                      />
+                    </svg>
+                    <span>اطلب عبر الموقع</span>
+                  </button>
                 </div>
-              </SwiperSlide>
+              </div>
             ))}
-          </Swiper>
-        </div>
+          </div>
+        </section>
 
-        {/* المجموعة الثانية */}
-        <div className="mb-16">
+        {/* قسم مجموعة الكتب الكاملة */}
+        <section className="mb-16 sm:mb-20">
+          {/* عنوان القسم - مجموعة الكتب الكاملة */}
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 font-reem-kufi mb-3 bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">
+              مجموعة الكتب الكاملة
+            </h2>
+            <p className="text-gray-600 text-base sm:text-lg font-cairo max-w-2xl mx-auto">
+              استكشف مجموعتنا الكاملة من الكتب الإسلامية المختارة بعناية
+            </p>
+          </div>
+
+          {/* كاروسيل مجموعة الكتب الكاملة */}
+          <div className="mb-16 sm:mb-20">
           <Swiper
             modules={[Navigation, Pagination]}
             spaceBetween={24}
@@ -249,40 +295,47 @@ export default function Home() {
               },
             }}
           >
-            {books.slice(11, 21).map((book) => (
+            {books.slice(8).map((book, index) => (
               <SwiperSlide key={book.id}>
-                  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 h-full">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-green-100/50 hover:-translate-y-1 transition-all duration-300 h-full flex flex-col group">
                   {/* صورة الغلاف */}
-                  <div className="w-full h-64 relative bg-gray-100 overflow-hidden">
+                  <div className="w-full h-72 relative bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
                     <Image
                       src={book.image}
                       alt={`غلاف كتاب ${book.title} للمؤلف ${book.author}`}
                       fill
-                      className="object-cover"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       loading="lazy"
-                      quality={80}
+                      quality={85}
                     />
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
 
                   {/* معلومات الكتاب */}
-                  <div className="p-4 font-cairo">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2" title={book.title}>
+                  <div className="p-5 sm:p-6 font-cairo flex-1 flex flex-col">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 h-[3.5rem] overflow-hidden text-ellipsis line-clamp-2 leading-snug group-hover:text-green-700 transition-colors" title={book.title}>
                       {formatBookTitle(book.title)}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3">{book.author}</p>
+                    <p className="text-sm sm:text-base text-gray-600 mb-4 font-medium">{book.author}</p>
 
                     {/* السعر */}
                     {book.price && (
-                      <p className="text-lg font-bold text-green-700 mb-4">
-                        {formatPrice(book.price)}
-                      </p>
+                      <div className="mb-5">
+                        <p className="text-xl sm:text-2xl font-bold text-green-600">
+                          {formatPrice(book.price)}
+                        </p>
+                      </div>
                     )}
 
                     {/* زر الطلب */}
                     <button
-                      onClick={() => handleOpenModal(book.id)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                      onClick={(e) => {
+                        e.stopPropagation(); // منع فتح Details Modal عند النقر على الزر
+                        handleOpenOrderModalDirect(book.id);
+                      }}
+                      className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-green-500/30 mt-auto"
                       aria-label={`طلب ${book.title} عبر الموقع`}
                     >
                       <svg
@@ -305,22 +358,26 @@ export default function Home() {
               </SwiperSlide>
             ))}
           </Swiper>
-        </div>
+          </div>
+        </section>
 
         {/* قسم توضيحي - كيف تطلب كتابك */}
-        <section className="bg-white rounded-lg shadow-md p-8 mb-8 font-cairo">
-          <h2 className="text-2xl font-bold text-gray-800 mb-12 text-center">
+        <section className="bg-gradient-to-br from-white via-green-50/30 to-white rounded-2xl shadow-xl border border-green-100/50 p-8 sm:p-12 mb-12 sm:mb-16 font-cairo">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 text-center font-reem-kufi bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">
             كيف تطلب كتابك؟
           </h2>
+          <p className="text-center text-gray-600 mb-10 sm:mb-12 text-sm sm:text-base max-w-2xl mx-auto">
+            عملية بسيطة وسريعة في 4 خطوات فقط
+          </p>
           <div className="max-w-6xl mx-auto">
             <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
               {/* Card 1 */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition-all w-full md:w-[250px] min-h-[200px] flex items-center">
+              <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 w-full md:w-[280px] min-h-[220px] flex items-center group">
                 <div className="flex flex-col items-center text-center w-full">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     1
                   </div>
-                  <p className="text-gray-800 font-semibold text-sm leading-relaxed">
+                  <p className="text-gray-800 font-bold text-base sm:text-lg leading-relaxed">
                     اختر الكتاب الذي تريد شراءه
                   </p>
                 </div>
@@ -339,12 +396,12 @@ export default function Home() {
               </div>
 
               {/* Card 2 */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition-all w-full md:w-[250px] min-h-[200px] flex items-center">
+              <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 w-full md:w-[280px] min-h-[220px] flex items-center group">
                 <div className="flex flex-col items-center text-center w-full">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     2
                   </div>
-                  <p className="text-gray-800 font-semibold text-sm leading-relaxed">
+                  <p className="text-gray-800 font-bold text-base sm:text-lg leading-relaxed">
                     اضغط على زر "اطلب عبر الموقع"
                   </p>
                 </div>
@@ -363,13 +420,13 @@ export default function Home() {
               </div>
 
               {/* Card 3 */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition-all w-full md:w-[250px] min-h-[200px] flex items-center">
+              <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 w-full md:w-[280px] min-h-[220px] flex items-center group">
                 <div className="flex flex-col items-center text-center w-full">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     3
                   </div>
-                  <p className="text-gray-800 font-semibold text-sm leading-relaxed">
-                    سيتم فتح واتساب برسالة جاهزة باسم الكتاب
+                  <p className="text-gray-800 font-bold text-base sm:text-lg leading-relaxed">
+                    املأ النموذج: الاسم، الهاتف، العنوان واختر الكتب
                   </p>
                 </div>
               </div>
@@ -387,13 +444,13 @@ export default function Home() {
               </div>
 
               {/* Card 4 */}
-              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-md p-6 border border-green-200 hover:shadow-lg transition-all w-full md:w-[250px] min-h-[200px] flex items-center">
+              <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 w-full md:w-[280px] min-h-[220px] flex items-center group">
                 <div className="flex flex-col items-center text-center w-full">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-full flex items-center justify-center text-white font-bold text-xl mb-4 shadow-lg flex-shrink-0">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center text-white font-bold text-2xl mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     4
                   </div>
-                  <p className="text-gray-800 font-semibold text-sm leading-relaxed">
-                    أرسل الرسالة، وستتواصل معك المكتبة عبر واتساب لتأكيد الطلب
+                  <p className="text-gray-800 font-bold text-base sm:text-lg leading-relaxed">
+                    أرسل الطلب، وستتواصل معك المكتبة عبر الهاتف لتأكيد الطلب
                   </p>
                 </div>
               </div>
@@ -402,110 +459,121 @@ export default function Home() {
         </section>
 
         {/* قسم مميزاتنا */}
-        <section className="bg-gradient-to-br from-green-50 to-stone-50 rounded-lg shadow-md p-8 mb-8 font-cairo">
-          <h2 className="text-2xl font-bold text-gray-800 mb-10 text-center">
+        <section className="bg-gradient-to-br from-white via-green-50/40 to-stone-50 rounded-2xl shadow-xl border border-green-100/50 p-8 sm:p-12 mb-12 sm:mb-16 font-cairo">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 text-center font-reem-kufi bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">
             لماذا تختار مكتبة النور؟
           </h2>
+          <p className="text-center text-gray-600 mb-10 sm:mb-12 text-sm sm:text-base max-w-2xl mx-auto">
+            نقدم لك أفضل تجربة شراء كتب إسلامية
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {/* ميزة 1 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">توصيل سريع</h3>
-              <p className="text-sm text-gray-600">نوصل طلبك بأسرع وقت ممكن</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition-colors">توصيل سريع</h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">نوصل طلبك بأسرع وقت ممكن</p>
             </div>
 
             {/* ميزة 2 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">كتب أصلية</h3>
-              <p className="text-sm text-gray-600">جميع الكتب أصلية ومضمونة الجودة</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition-colors">كتب أصلية</h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">جميع الكتب أصلية ومضمونة الجودة</p>
             </div>
 
             {/* ميزة 3 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">أسعار مناسبة</h3>
-              <p className="text-sm text-gray-600">أسعار تنافسية ومناسبة للجميع</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition-colors">أسعار مناسبة</h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">أسعار تنافسية ومناسبة للجميع</p>
             </div>
 
             {/* ميزة 4 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100 hover:shadow-md transition-shadow text-center">
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-2xl shadow-lg border border-green-100 p-6 sm:p-8 hover:shadow-xl hover:border-green-200 hover:-translate-y-1 transition-all duration-300 text-center group">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-green-500/30 group-hover:scale-110 transition-transform duration-300">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-gray-800 mb-2">خدمة عملاء متميزة</h3>
-              <p className="text-sm text-gray-600">نحن دائماً هنا لمساعدتك</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-700 transition-colors">خدمة عملاء متميزة</h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">نحن دائماً هنا لمساعدتك</p>
             </div>
           </div>
         </section>
 
         {/* قسم الأسئلة الشائعة */}
-        <section className="bg-white rounded-lg shadow-md p-8 mb-8 font-cairo">
-          <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center">
+        <section className="bg-gradient-to-br from-white via-green-50/30 to-white rounded-2xl shadow-xl border border-green-100/50 p-8 sm:p-12 mb-12 sm:mb-16 font-cairo">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 text-center font-reem-kufi bg-gradient-to-r from-green-700 to-green-600 bg-clip-text text-transparent">
             أسئلة شائعة
           </h2>
+          <p className="text-center text-gray-600 mb-10 sm:mb-12 text-sm sm:text-base max-w-2xl mx-auto">
+            إجابات على الأسئلة الأكثر شيوعاً
+          </p>
           <div className="max-w-3xl mx-auto space-y-4">
             {/* سؤال 1 */}
-            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                💳 كيف يمكنني الدفع؟
+            <div className="bg-white rounded-xl p-6 sm:p-7 border border-green-100 shadow-md hover:shadow-lg hover:border-green-200 transition-all duration-300">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-2xl">💳</span>
+                <span>كيف يمكنني الدفع؟</span>
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                 الدفع يتم نقداً عند الاستلام. لا حاجة للدفع مسبقاً.
               </p>
             </div>
 
             {/* سؤال 2 */}
-            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                📦 كم تستغرق مدة التوصيل؟
+            <div className="bg-white rounded-xl p-6 sm:p-7 border border-green-100 shadow-md hover:shadow-lg hover:border-green-200 transition-all duration-300">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-2xl">📦</span>
+                <span>كم تستغرق مدة التوصيل؟</span>
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                نوصل الطلبات خلال 3-7 أيام عمل حسب موقعك. سيتم التواصل معك عبر واتساب لتأكيد العنوان.
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                نوصل الطلبات خلال 3-7 أيام عمل حسب موقعك. سيتم التواصل معك عبر الهاتف لتأكيد العنوان.
               </p>
             </div>
 
             {/* سؤال 3 */}
-            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                🗺️ هل تصلون لجميع المناطق؟
+            <div className="bg-white rounded-xl p-6 sm:p-7 border border-green-100 shadow-md hover:shadow-lg hover:border-green-200 transition-all duration-300">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-2xl">🗺️</span>
+                <span>هل تصلون لجميع المناطق؟</span>
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
                 نعم، نقدم خدمة التوصيل لجميع أنحاء تونس. يمكنك التواصل معنا عبر واتساب للاستفسار عن منطقتك.
               </p>
             </div>
 
             {/* سؤال 4 */}
-            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                📚 هل جميع الكتب متوفرة؟
+            <div className="bg-white rounded-xl p-6 sm:p-7 border border-green-100 shadow-md hover:shadow-lg hover:border-green-200 transition-all duration-300">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-2xl">📚</span>
+                <span>هل جميع الكتب متوفرة؟</span>
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                نعم، جميع الكتب المعروضة متوفرة. في حالة عدم التوفر، سنتواصل معك فوراً عبر واتساب.
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                نعم، جميع الكتب المعروضة متوفرة. في حالة عدم التوفر، سنتواصل معك فوراً عبر الهاتف.
               </p>
             </div>
 
             {/* سؤال 5 */}
-            <div className="bg-green-50 rounded-lg p-5 border border-green-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">
-                ❓ هل يمكنني طلب أكثر من كتاب؟
+            <div className="bg-white rounded-xl p-6 sm:p-7 border border-green-100 shadow-md hover:shadow-lg hover:border-green-200 transition-all duration-300">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <span className="text-2xl">❓</span>
+                <span>هل يمكنني طلب أكثر من كتاب؟</span>
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                نعم بالطبع! يمكنك طلب أي عدد من الكتب. فقط اختر الكتب التي تريدها واضغط على زر "اطلب عبر الموقع" لكل كتاب.
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+                نعم بالطبع! يمكنك طلب أي عدد من الكتب. فقط اختر الكتب التي تريدها من خلال النموذج.
               </p>
             </div>
           </div>
@@ -513,10 +581,18 @@ export default function Home() {
 
       </main>
 
+      {/* Book Details Modal */}
+      <BookDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        bookId={selectedDetailsBookId}
+        onOrderClick={handleOpenOrderModal}
+      />
+
       {/* Order Modal */}
       <OrderModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isOrderModalOpen}
+        onClose={handleCloseOrderModal}
         initialBookId={selectedBookId}
       />
 
@@ -530,7 +606,7 @@ export default function Home() {
           const whatsappUrl = `https://wa.me/+905011375220?text=${encodeURIComponent(message)}`;
           window.open(whatsappUrl, "_blank");
         }}
-        className="fixed bottom-6 right-6 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl hover:shadow-green-500/50 transition-all duration-300 flex items-center justify-center group hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-full shadow-2xl shadow-green-500/40 hover:shadow-green-500/60 transition-all duration-300 flex items-center justify-center group hover:scale-110 active:scale-95"
         aria-label="اطلب الآن عبر واتساب"
       >
         <svg
@@ -544,9 +620,9 @@ export default function Home() {
       </button>
 
       {/* Footer */}
-      <footer className="bg-[#e5f5e0] text-gray-800 py-8 font-cairo">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-6">
+      <footer className="bg-gradient-to-b from-green-50 to-white border-t border-green-100 text-gray-800 py-10 sm:py-12 font-cairo">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8">
             <div className="flex justify-center items-center gap-6">
               {/* Facebook Icon */}
               <a

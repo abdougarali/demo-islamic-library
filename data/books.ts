@@ -8,6 +8,7 @@ export interface Book {
   author: string;
   price?: number; // السعر بالمليم (مثال: 45900 = 45.9 دينار)
   image: string; // مسار صورة الكتاب
+  description?: string; // وصف الكتاب
 }
 
 /**
